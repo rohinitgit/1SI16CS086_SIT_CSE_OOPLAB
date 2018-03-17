@@ -1,0 +1,39 @@
+Type Conversions with User Defined Types
+
+Basic to User-Defined
+============================================
+To go from a basic type to a user-defined type we use a constructor with one argument. 
+These are sometimes called conversion constructors.
+
+You can also use the overloaded assignment operator
+
+
+From User-Defined to Basic
+============================================
+We use a conversion operator.
+
+A conversion function must be a member function, may not specify a return type, 
+and must have an empty parameter list. The function usually should be const.
+
+Conversions between two user-defined types. 
+============================================
+you can use a one-argument constructor 
+
+				or 
+				
+you can use a conversion operator.
+
+Class A to Class B in Class A
+	it is implemented as a conversion operator.
+	
+Class B to Class A in Class A
+	it is implemented using a one-argument constructor 
+	
+Class B to Class A in Class B
+	it is implemented as a conversion operator.
+
+Class A to Class B in Class B
+	it is implemented using a one-argument constructor 
+
+
+

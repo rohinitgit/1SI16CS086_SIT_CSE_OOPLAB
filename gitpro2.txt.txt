@@ -1,0 +1,7 @@
+#include<iostream>
+int main(void)
+{
+	printf("git program\n");
+	printf("sgdfksjfgdfd");
+	printf("ffjfgsajkfg");
+}

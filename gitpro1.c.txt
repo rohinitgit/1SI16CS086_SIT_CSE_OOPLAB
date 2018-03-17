@@ -1,0 +1,6 @@
+#include<iostream>
+{
+	printf("st");
+
+	printf("learning git\n")
+}

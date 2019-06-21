@@ -1,0 +1,360 @@
+
+/*C PROGRAM TO IMPLEMENT ONLINE SHOPPING OF LAPTOPS*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include<ctype.h>
+#define PIN 81730
+FILE *fp1,*fp2,*fp3,*fp4,*fp5;
+FILE *c_id,*s;
+int a;
+
+/*STRUCTURE FOR LAPTOP DETAILS*/ 
+struct laptop
+{
+
+    char company[20];
+    int n_models;
+    struct models
+    {
+        char model_name[30];
+        char processor[3];
+        int quantity,memory;
+        float price;
+        int rating;
+        char colour[10];
+    }s[20];
+}l[5];
+/*STRUCTURE FOR CUSTOMER DETAILS*/
+struct customer
+{
+    char name[30];
+    long int phone_num;
+    struct adress
+    {
+        int house_no;
+        char colony[20];
+        char city[20];
+        int pincode;
+
+    struct cart
+    {
+        char products_name[20];
+        float total;
+        int shopping_points;
+    }bag;
+    }a;
+
+}c[100];
+/*STRUCTURE FOR ORDER DETAILS*/
+typedef struct order
+{
+
+    int date;
+     char name[20];
+    float cost;
+    int quantity;
+    int feedback;
+    struct order *next;
+    int points;
+}ORDER;
+ORDER *first=NULL;
+/*MODULE TO STORE THE PRODUCT DETAILS*/
+void details_product(int n)
+{
+
+    switch(n)
+    {
+      case 1:read_detail(fp1,n);
+              break;
+      case 2:read_detail(fp2,n);
+              break;
+      case 3:read_detail(fp3,n);
+              break;
+      case 4:read_detail(fp4,n);
+              break;
+      case 5:read_detail(fp5,n);
+              break;
+    }
+}
+
+void read_detail(FILE *p1,int n)
+{
+    int i;
+    char file[20];
+    switch(n)
+    {
+        case 1:strcpy(file,"DELL");
+                break;
+        case 2:strcpy(file,"HP");
+                break;
+        case 3:strcpy(file,"LENOVO");
+                break;
+        case 4:strcpy(file,"SONY");
+                break;
+        case 5:strcpy(file,"ACER");
+                break;
+    }
+    printf("\n Details of all the laptops which are available in our shop\n");
+
+  printf("\n Enter the details of laptop %s\n",file);
+  printf("\n Enter the no. of models\n");
+  scanf("%d",&l[n].n_models);
+  for(i=0;i<l[n].n_models;i++)
+  {
+
+      p1=fopen(file,"a+");
+      if(p1==NULL)
+      {
+          printf("\n Error in opening file\n");
+          exit(0);
+      }
+      printf("\n Enter the model_name:\n");
+      scanf("%s",l[n].s[i].model_name);
+      printf("\n Enter detail of model %d\n",i+1);
+      printf("\n Processsor:");
+      scanf("%s",l[n].s[i].processor);
+      printf("\n Memory in GB or TB:");
+      scanf("%d",&l[n].s[i].memory);
+      printf("\n Price:");
+      scanf("%f",&l[n].s[i].price);
+      printf("\n Number of %s laptop of %s processor:",file,l[n].s[i].processor);
+      scanf("%d",&l[n].s[i].quantity);
+      printf("\n Colour of %s laptop:",file);
+      scanf("%s",l[n].s[i].colour);
+      fprintf(p1,"\n%s\n%s\t\t%d\t\t%f\t\t%d\t\t%s\n",l[n].s[i].model_name,l[n].s[i].processor,l[n].s[i].memory,l[n].s[i].price,l[n].s[i].quantity,l[n].s[i].colour);
+      fclose(p1);
+    }
+
+}
+/*MODULE TO DISPLAY THE CONTENTS AND SPECIFICATIONS OF LAPTOPS*/
+ void  display(FILE *fp1,int a,int n)
+{
+    int m;
+
+    printf("\n MODEL_NAME\tPROCESSOR\tMEMORY\tPRICE\tQUANTITY\tCOLOUR\n");
+    while((fscanf(fp1,"%s\t%s\t%d\t%f\t%d\t%s\n",l[a].s[n].model_name,l[a].s[n].processor,&l[a].s[n].memory,&l[a].s[n].price,&l[a].s[n].quantity,l[a].s[n].colour))!=EOF)
+    {
+        printf("%s\t%s\t\t%d\t%3.1f\t\t%d\t%s\n",l[a].s[n].model_name,l[a].s[n].processor,l[a].s[n].memory,l[a].s[n].price,l[a].s[n].quantity,l[a].s[n].colour);
+         printf("\n1:Buy now,2:Add to cart,3:Look for next,4:Exit\n");
+         scanf("%d",&m);
+         if(m==1)
+          {
+           place_order(first,l[a].s[n].model_name,l[a].s[n].price);
+          // exit(0);
+          }
+          else if(m==2)
+         {
+           c_id=fopen("customer","a+");
+           //printf("fweuf");
+           if(c_id==NULL)
+           {
+               printf("\n Error in opening file");
+               exit(0);
+           }
+           else
+           {
+            fprintf(c_id,"%s\t\t%d\t\t%f\t\t%d\t\t%s\t\t%d",l[a].s[n].processor,l[a].s[n].memory,l[a].s[n].price,l[a].s[n].quantity,l[a].s[n].colour,l[a].s[n].rating);
+            printf("\n Item added to your cart\n");
+            break;
+            fclose(c_id);
+           }
+        }
+        else if(m==4)
+            exit(0);
+    }
+}
+
+/*MODULE TO GET THE ORDERS FROM THE CUSTOMERS*/
+void place_order(ORDER *first,char modelname[],float pr)
+{
+    int q,n,pay;
+    ORDER *newnode;
+    newnode=(ORDER *)malloc(sizeof(ORDER));
+    newnode->cost=pr;
+    newnode->points=0;
+    strcpy(newnode->name,modelname);
+
+    c_id=fopen("customer","a+");
+    if(c_id==NULL)
+    {
+        printf("file not exits\n");
+        exit(0);
+    }
+    else
+
+        read_customer_details(c_id);
+
+
+       newnode->next=NULL;
+
+    first=newnode;
+    printf("\n Payment option:\n");
+    printf("\n Pay through:1:Debit_card,2:Online_banking,3:Credit_card\n");
+    scanf("%d",&pay);
+    printf("\n Your order will be delivered within five days\n");
+    deliver_order(first);
+}
+/*MODULE TO READ THE CUSTOMER DETAILS FOR DELIVERING*/
+
+void read_customer_details(FILE *c_id)
+{
+    printf("\n Enter your name:");
+    scanf("%s",c[1].name);
+    printf("\n Enter your phone num:");
+    scanf("%ld",&c[1].phone_num);
+    printf("\n House no:");
+    scanf("%d",&c[1].a.house_no);
+    printf("\n Colony:");
+    scanf("%s",c[1].a.colony);
+    printf("\n City:");
+    scanf("%s",c[1].a.city);
+    printf("\n Pincode:");
+    scanf("%d",&c[1].a.pincode);
+    fprintf(c_id,"%s\n%ld\n%d\n%s\n%s\n%d\n",c[1].name,c[1].phone_num,c[1].a.house_no,c[1].a.colony,c[1].a.city,c[1].a.pincode);
+    fclose(c_id);
+}
+
+/*MODULE FOR DELIVER THE ORDERED PRODUCT*/
+void deliver_order(ORDER *first)
+{
+
+    ORDER *temp;
+    int f;
+    printf("\n Product is delivered\n");
+    printf("\n Enter your feedback\n");
+    printf("\n 1:Bad,2:Good,3:Satisfied,4:Very_Good,5:Advisable:\n");
+    scanf("%d",&f);
+    first->feedback=f;
+    temp=first;
+    first=first->next;
+    free(temp);
+
+}
+
+int main()
+{
+    FILE *fp1;
+    int choice,op,customer_choice,pin;
+    while(1)
+
+{
+
+    printf("\n 1.Producer 2.Customer 3.Exit\n");
+    printf("\n Enter your choice\n");
+    scanf("%d",&choice);
+    if(choice==1)
+    {
+        printf("\n Enter password:\n");
+        scanf("%d",&pin);
+        if(pin==PIN)
+        {
+        printf("\n 1.Dell 2.HP 3.LENOVO 4.SONY 5.ACER\n");
+        printf("\n Enter your option\n");
+        scanf("%d",&op);
+        switch(op)
+        {
+            case 1:details_product(op);
+                    break;
+            case 2:details_product(op);
+                    break;
+            case 3:details_product(op);
+                    break;
+            case 4:details_product(op);
+                    break;
+            case 5:details_product(op);
+                    break;
+        }
+        }
+        else
+            printf("Illegel access..!!\n");
+    }
+    if(choice==3)
+    {
+      printf("\nTHANK YOU..VISIT AGAIN....!!!!\n");
+      exit(0);
+    }
+
+    if(choice==2)
+    {
+    printf("\n .......*WELCOME TO OUR SHOP*.......\n");
+    printf("\n Choose your laptop company_name\n");
+    printf("\n1.Dell 2.HP 3.LENOVO 4.SONY 5.ACER\n");
+    printf("\n Enter your choice\n");
+    scanf("%d",&customer_choice);
+    switch(customer_choice)
+    {
+        case 1:fp1=fopen("DELL","r");
+               if(fp1==NULL)
+               {
+                   printf("error\n");
+                   return;
+               }
+               else
+               {
+                   printf("\n Available models in dell:\n");
+                   display(fp1,l[1].n_models,1);
+                   fclose(fp1);
+               }
+               break;
+    case 2:fp2=fopen("HP","r");
+               if(fp2==NULL)
+               {
+                   printf("error\n");
+                   return;
+               }
+               else
+               {
+                   printf("\n Available models in HP:\n");
+                   display(fp2,l[1].n_models,1);
+                   fclose(fp2);
+               }
+               break;
+    case 3:fp3=fopen("LENOVO","r");
+               if(fp3==NULL)
+               {
+                   printf("\n Error\n");
+                   return;
+               }
+               else
+               {
+                   printf("\n Available models in lenova:\n");
+                   display(fp3,l[1].n_models,1);
+                   fclose(fp3);
+               }
+               break;
+    case 4:fp4=fopen("SONY","r");
+               if(fp4==NULL)
+               {
+                   printf("\n Error\n");
+                   return;
+               }
+               else
+               {
+                   printf("\n Available models in sony:\n");
+                   display(fp4,l[1].n_models,1);
+                   fclose(fp4);
+               }
+               break;
+        case 5:fp5=fopen("ACER","r");
+               if(fp5==NULL)
+               {
+                   printf("\n Error\n");
+                   return;
+               }
+               else
+               {
+                   printf("\n Available models in acer:\n");
+                   display(fp5,l[1].n_models,1);
+                   fclose(fp5);
+               }
+               break;
+
+
+    }
+    }
+
+
+}
+   return 0;
+}
